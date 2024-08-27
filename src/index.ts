@@ -1,12 +1,4 @@
-import express, { Express, Request, Response } from "express";
-import HomeRouter from "./routes/home";
-import dotenv from "dotenv";
-
-const app: Express = express();
-
-dotenv.config();
-
-app.use("/", HomeRouter);
+import app from "./app";
 
 const port = process.env.PORT || 4000;
 
