@@ -1,10 +1,9 @@
 import { z } from "zod";
 
 const MeasurementSchema = z.object({
-  image: z.string(),
   customer_code: z.string(),
-  measure_datetime: z.date(),
-  measure_type: z.enum(["WATER", "GAS"]),
+  measure_datetime: z.string().date(),
+  measure_type: z.enum(["WATER", "GAS"]).default("WATER"),
 });
 
 type Measurement = z.infer<typeof MeasurementSchema>;
