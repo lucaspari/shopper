@@ -8,4 +8,4 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/measurement/", measurementController);
 
-export default app;
+export { app };

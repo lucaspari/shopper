@@ -5,8 +5,7 @@
   "scripts": {
     "test": "jest",
     "dev": "ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node dist/index.js"
+    "start": "ts-node -r tsconfig-paths/register src/index.ts"
   },
   "keywords": [],
   "author": "",
