@@ -9,13 +9,14 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 model Measure{
   id         String   @id @default(cuid()) @map("_id")
   customer_code  String
-  measure_datetime DateTime
+  measure      Float
+  measure_datetime DateTime @default(now()) 
   measure_type   MeasureType @default(WATER)
    @@map("measurements")
 }

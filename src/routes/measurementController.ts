@@ -3,6 +3,7 @@ import { MeasurementSchema } from "@/types/measurement";
 import Error from "@/types/error";
 import utils from "@/utils/utils";
 import multer from "multer";
+import { createMeasurement } from "@/services/measurementService";
 
 const router = Router();
 const upload = multer({ dest: "uploads/" });
@@ -25,6 +26,7 @@ function handleUpload(req: Request, res: Response) {
     .then((result) => {
       MeasurementSchema.parse(body);
       const measure = utils.getNumberInsideString(result);
+      createMeasurement({ ...body, measure });
       return res.status(201).json(measure);
     })
     .catch((error) => {
