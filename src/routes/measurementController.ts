@@ -3,7 +3,10 @@ import { MeasurementSchema } from "@/types/measurement";
 import Error from "@/types/error";
 import utils from "@/utils/utils";
 import multer from "multer";
-import { createMeasurement } from "@/services/measurementService";
+import {
+  createMeasurement,
+  verifyIfMeasuredInCurrentMonth,
+} from "@/services/measurementService";
 
 const router = Router();
 const upload = multer({ dest: "uploads/" });
@@ -15,8 +18,8 @@ function handleUpload(req: Request, res: Response) {
 
   if (!file || !utils.verifyIfIsImage(file)) {
     const error: Error = {
-      error_description: "No file uploaded",
-      error_code: 400,
+      error_description: "Nenhum arquivo foi enviado",
+      error_code: "NO_FILE",
     };
     return res.status(400).json(error);
   }
@@ -26,8 +29,29 @@ function handleUpload(req: Request, res: Response) {
     .then((result) => {
       MeasurementSchema.parse(body);
       const measure = utils.getNumberInsideString(result);
-      createMeasurement({ ...body, measure });
-      return res.status(201).json(measure);
+      verifyIfMeasuredInCurrentMonth({ ...body, measure })
+        .then((isMeasured) => {
+          if (isMeasured) {
+            return res.status(409).json({
+              error_description: "Leitura do mês já realizada",
+              error_code: "DOUBLE_REPORT",
+            });
+          } else {
+            createMeasurement({ ...body, measure }).then((data) => {
+              return res.status(201).json({
+                image_url: file.destination.concat(file.filename),
+                measure_value: measure,
+                measure_uuid: data.id,
+              });
+            });
+          }
+        })
+        .catch((error) => {
+          return res.status(400).json({
+            error_description: "dados invalidos",
+            error_code: "INVALID_DATA",
+          });
+        });
     })
     .catch((error) => {
       return res
