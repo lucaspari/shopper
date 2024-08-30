@@ -3,8 +3,37 @@ services:
   mysql:
     image: mysql:8
     container_name: mysql-database
+    networks:
+      - shopper-network
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: shopper
     ports:
       - "3306:3306"
+
+  shopper:
+    build: .
+    container_name: shopper
+    command: ["npm", "start"]
+    networks:
+      - shopper-network
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: "mysql://root:root@mysql-database:3306/shopper"
+
+  prisma:
+    build: .
+    container_name: prisma
+    command: ["npx", "prisma", "migrate", "dev", "--name", "init"]
+    networks:
+      - shopper-network
+    depends_on:
+      - mysql
+    environment:
+      DATABASE_URL: "mysql://root:root@mysql-database:3306/shopper"
+networks:
+  shopper-network:
+    driver: bridge

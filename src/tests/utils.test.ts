@@ -2,7 +2,6 @@ import utils from "../utils/utils";
 import fs from "fs";
 import path from "path";
 
-// Mock the GoogleGenerativeAI class and its methods
 jest.mock("@google/generative-ai", () => {
   return {
     GoogleGenerativeAI: jest.fn().mockImplementation(() => {
