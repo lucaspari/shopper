@@ -22,3 +22,10 @@ experimental/**/*.db
 .nuxt
 dev.db
 data/*
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+*.tfvars
+*.tfstate*
+*.tfplan
+.terraform.lock.hcl
