@@ -6,7 +6,6 @@ yarn-error.log/
 vendor/
 tmp/
 dist/
-.DS_Store
 .idea
 tmp-resolvers
 package-lock.json
@@ -29,3 +28,5 @@ terraform.tfstate.backup
 *.tfstate*
 *.tfplan
 .terraform.lock.hcl
+docker
+.DS_Store
