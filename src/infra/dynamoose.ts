@@ -1,47 +1,37 @@
 import * as dynamoose from "dynamoose";
+import { measurementSchemaDynamoose } from "@/types/measurement";
 
 dynamoose.aws.ddb.local("http://localhost:8000");
 
-const measurementSchema = new dynamoose.Schema({
-  id: {
-    type: String,
-    hashKey: true, // This is the primary key
-  },
-  customer_code: {
-    type: String,
-    required: true,
-  },
-  measure: {
-    type: Number,
-    required: true,
-  },
-  measure_datetime: {
-    type: Date,
-    default: () => new Date(), // Default to current time
-  },
-  measure_type: {
-    type: String,
-    enum: ["WATER", "ELECTRICITY", "GAS"], // Example enum values
-    default: "WATER",
-  },
-});
+const Measurement = dynamoose.model(
+  "measurements-table",
+  measurementSchemaDynamoose
+);
 
-// Create the model
-const Measurement = dynamoose.model("measurements-table", measurementSchema);
+class MeasurementRepository {
+  private static instance: MeasurementRepository;
+  private connection: any;
 
-// Example: Create a new measurement entry
-const newMeasurement = new Measurement({
-  id: "MEAS123",
-  customer_code: "CUST123",
-  measure: 25.5,
-  measure_type: "WATER",
-});
+  private constructor() {}
 
-newMeasurement
-  .save()
-  .then(() => console.log("New measurement saved!"))
-  .catch((error) => console.error("Error saving measurement:", error));
+  public static getInstance(): MeasurementRepository {
+    if (!MeasurementRepository.instance) {
+      MeasurementRepository.instance = new MeasurementRepository();
+    }
+    return MeasurementRepository.instance;
+  }
 
-Measurement.get("MEAS123").then((measurement) => {
-  console.log("Found measurement:", measurement);
-});
+  public async connect() {
+    this.connection = Measurement;
+  }
+
+  public async create(measurement: any) {
+    return Measurement.create(measurement);
+  }
+
+  public async list() {
+    return Measurement.scan().exec();
+  }
+}
+
+export default MeasurementRepository;
