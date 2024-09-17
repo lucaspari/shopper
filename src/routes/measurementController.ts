@@ -4,42 +4,59 @@ import Error from "@/types/error";
 import utils from "@/utils/utils";
 import multer from "multer";
 import MeasurementRepository from "@/infra/dynamoose";
+import MeasurementService from "@/services/measurementService";
 
-const router = Router();
 const upload = multer({ dest: "uploads/" });
-
-router.post("/upload", upload.single("image"), handleUpload);
-router.get("/", handleList);
 const instance = MeasurementRepository.getInstance();
-function handleUpload(req: Request, res: Response) {
-  const { body, file } = req;
+const measurementService = new MeasurementService(instance);
 
-  if (!file || !utils.verifyIfIsImage(file)) {
-    const error: Error = {
-      error_description: "Nenhum arquivo foi enviado",
-      error_code: "NO_FILE",
-    };
-    return res.status(400).json(error);
+class MeasurementController {
+  public router: Router;
+
+  constructor() {
+    this.router = Router();
+    this.initializeRoutes();
   }
 
-  utils
-    .readingGeminiResult(file?.path)
-    .then((result) => {
+  private initializeRoutes() {
+    this.router.post("/upload", upload.single("image"), this.handleUpload);
+    this.router.get("/", this.handleList);
+  }
+
+  private async handleUpload(req: Request, res: Response) {
+    const { body, file } = req;
+
+    if (!file || !utils.verifyIfIsImage(file)) {
+      const error: Error = {
+        error_description: "Nenhum arquivo foi enviado",
+        error_code: "NO_FILE",
+      };
+      return res.status(400).json(error);
+    }
+
+    try {
+      const result = await utils.readingGeminiResult(file.path);
       MeasurementSchema.parse(body);
       const measure = utils.getNumberInsideString(result);
-      instance.create({ ...body, measure });
+      await measurementService.createMeasurement({ ...body, measure });
       return res.json({ message: "Medição enviada com sucesso" });
-    })
-    .catch((error) => {
+    } catch (error) {
       return res
         .status(500)
         .json({ error_description: "Internal Server Error" });
-    });
-}
-function handleList(req: Request, res: Response) {
-  instance.list().then((data) => {
-    return res.json(data);
-  });
+    }
+  }
+
+  private async handleList(req: Request, res: Response) {
+    try {
+      const data = await instance.list();
+      return res.json(data);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error_description: "Internal Server Error" });
+    }
+  }
 }
 
-export default router;
+export default new MeasurementController().router;
