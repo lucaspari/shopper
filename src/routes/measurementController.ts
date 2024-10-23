@@ -13,8 +13,8 @@ const measurementService = new MeasurementService(instance);
 class MeasurementController {
   public router: Router;
 
-  constructor() {
-    this.router = Router();
+  constructor(router: Router) {
+    this.router = router;
     this.initializeRoutes();
   }
 
@@ -39,7 +39,10 @@ class MeasurementController {
       MeasurementSchema.parse(body);
       const measure = utils.getNumberInsideString(result);
       await measurementService.createMeasurement({ ...body, measure });
-      return res.json({ message: "Medição enviada com sucesso" });
+      return res.json({
+        message: "Medição enviada com sucesso",
+        data: { ...body, measure },
+      });
     } catch (error) {
       return res
         .status(500)
@@ -59,4 +62,4 @@ class MeasurementController {
   }
 }
 
-export default new MeasurementController().router;
+export default MeasurementController;

@@ -1,3 +1,5 @@
+import { log } from "console";
+
 const path = require("path");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const fs = require("fs");
@@ -8,8 +10,13 @@ const utils = {
     return allowedExtensions.test(path.extname(file.originalname));
   },
   getNumberInsideString: (str: string): number => {
-    str = str.replace(/[^0-9]/g, "");
-    return parseInt(str);
+    const cleanedStr = str.replace(/[^0-9]/g, "");
+    const parsedNumber = parseInt(cleanedStr, 10);
+    if (isNaN(parsedNumber)) {
+      log("There is no number inside the data");
+      return 0;
+    }
+    return parsedNumber;
   },
   readingGeminiResult: async (path: any): Promise<string> => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);

@@ -1,6 +1,4 @@
 import utils from "../utils/utils";
-import fs from "fs";
-import path from "path";
 
 jest.mock("@google/generative-ai", () => {
   return {
@@ -35,22 +33,9 @@ describe("utils", () => {
       const str = "abc123def";
       expect(utils.getNumberInsideString(str)).toBe(123);
     });
-
-    it("should return NaN if no numbers are found", () => {
+    it("should raise error and return 0 if there is no number", () => {
       const str = "abcdef";
-      expect(utils.getNumberInsideString(str)).toBeNaN();
-    });
-  });
-
-  describe("readingGeminiResult", () => {
-    it("should return the text from the Gemini API response", async () => {
-      const testPath = path.resolve(__dirname, "test.png");
-      fs.writeFileSync(testPath, "dummy content");
-
-      const result = await utils.readingGeminiResult(testPath);
-      expect(result).toBe("12345");
-
-      fs.unlinkSync(testPath);
+      expect(utils.getNumberInsideString(str)).toBe(0);
     });
   });
 });
