@@ -20,7 +20,19 @@ class MeasurementController {
 
   private initializeRoutes() {
     this.router.post("/upload", upload.single("image"), this.handleUpload);
+    this.router.delete("/:id", this.handleDelete);
     this.router.get("/", this.handleList);
+  }
+  private async handleDelete(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      await measurementService.deleteMeasurement(id);
+      return res.status(200).json({ message: "Medição deletada com sucesso" });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ error_description: "Internal Server Error" });
+    }
   }
 
   private async handleUpload(req: Request, res: Response) {

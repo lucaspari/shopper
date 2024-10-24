@@ -11,6 +11,9 @@ class MeasurementService {
   createMeasurement(measure: Measurement) {
     return this.measurementRepository.create(measure);
   }
+  deleteMeasurement(id: string) {
+    return this.measurementRepository.delete(id);
+  }
 }
 
 export default MeasurementService;

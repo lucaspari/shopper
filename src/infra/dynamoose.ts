@@ -32,6 +32,9 @@ class MeasurementRepository {
   public async list() {
     return Measurement.scan().exec();
   }
+  public async delete(id: string) {
+    return Measurement.delete({ id });
+  }
 }
 
 export default MeasurementRepository;
